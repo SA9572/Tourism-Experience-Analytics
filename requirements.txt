@@ -6,4 +6,6 @@ joblib
 gunicorn
 pyarrow
 openpyxl
+imbalanced-learn
+scipy
 

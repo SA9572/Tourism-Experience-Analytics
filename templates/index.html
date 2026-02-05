@@ -1,144 +1,176 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tourism Experience Analytics</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
+  </head>
+  <body>
     <header class="hero">
-        <div class="hero-content">
-            <h1>Tourism Experience Analytics</h1>
-            <p>Predict visit mode, estimate attraction ratings, and get personalized recommendations.</p>
-        </div>
+      <div class="hero-content">
+        <h1>Tourism Experience Analytics</h1>
+        <p>
+          Predict visit mode, estimate attraction ratings, and get personalized
+          recommendations.
+        </p>
+      </div>
+      <nav class="hero-nav">
+        {% if user %}
+        <span class="hero-user">Logged in as {{ user.email }}</span>
+        <a href="{{ url_for('history') }}" class="hero-link">History</a>
+        <a href="{{ url_for('logout') }}" class="hero-link">Logout</a>
+        {% else %}
+        <a href="{{ url_for('login') }}" class="hero-link">Login / Sign up</a>
+        {% endif %}
+      </nav>
     </header>
 
     <main class="container">
-        <section class="card">
-            <h2>Traveler Profile & Preference</h2>
-            <form method="POST" class="grid-form">
-                <div class="form-group">
-                    <label for="UserId">User ID (for personalized recommendations)</label>
-                    <input type="number" name="UserId" id="UserId" placeholder="e.g. 101" />
-                </div>
+      <section class="card">
+        <h2>Traveler Profile & Preference</h2>
+        <form method="POST" class="grid-form">
+          <div class="form-group">
+            <label for="UserId"
+              >User ID (for personalized recommendations)</label
+            >
+            <input
+              type="number"
+              name="UserId"
+              id="UserId"
+              placeholder="e.g. 101"
+            />
+          </div>
 
-                {% if 'VisitYear' in feature_columns %}
-                <div class="form-group">
-                    <label for="VisitYear">Visit Year</label>
-                    <select name="VisitYear" id="VisitYear">
-                        <option value="">Select year</option>
-                        {% for y in years %}
-                        <option value="{{ y }}">{{ y }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                {% endif %}
+          {% if 'VisitYear' in feature_columns %}
+          <div class="form-group">
+            <label for="VisitYear">Visit Year</label>
+            <select name="VisitYear" id="VisitYear">
+              <option value="">Select year</option>
+              {% for y in years %}
+              <option value="{{ y }}">{{ y }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          {% endif %} {% if 'VisitMonth' in feature_columns %}
+          <div class="form-group">
+            <label for="VisitMonth">Visit Month</label>
+            <select name="VisitMonth" id="VisitMonth">
+              <option value="">Select month</option>
+              {% for m in months %}
+              <option value="{{ m }}">{{ m }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          {% endif %} {% if 'UserContinent_Continent' in feature_columns %}
+          <div class="form-group">
+            <label for="UserContinent_Continent">Continent</label>
+            <select name="UserContinent_Continent" id="UserContinent_Continent">
+              <option value="">Select continent</option>
+              {% for c in continents %}
+              <option value="{{ c }}">{{ c }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          {% endif %} {% if 'AttractionType' in feature_columns %}
+          <div class="form-group">
+            <label for="AttractionType">Attraction Type</label>
+            <select name="AttractionType" id="AttractionType">
+              <option value="">Select attraction type</option>
+              {% for t in attraction_types %}
+              <option value="{{ t }}">{{ t }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          {% endif %}
 
-                {% if 'VisitMonth' in feature_columns %}
-                <div class="form-group">
-                    <label for="VisitMonth">Visit Month</label>
-                    <select name="VisitMonth" id="VisitMonth">
-                        <option value="">Select month</option>
-                        {% for m in months %}
-                        <option value="{{ m }}">{{ m }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                {% endif %}
+          <div class="form-actions">
+            <button
+              type="submit"
+              name="action"
+              value="predict"
+              class="btn-primary"
+            >
+              Predict & Recommend
+            </button>
+            <button
+              type="submit"
+              name="action"
+              value="clear"
+              class="btn-secondary"
+            >
+              Clear
+            </button>
+          </div>
+        </form>
 
-                {% if 'UserContinent_Continent' in feature_columns %}
-                <div class="form-group">
-                    <label for="UserContinent_Continent">Continent</label>
-                    <select name="UserContinent_Continent" id="UserContinent_Continent">
-                        <option value="">Select continent</option>
-                        {% for c in continents %}
-                        <option value="{{ c }}">{{ c }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                {% endif %}
+        {% if prediction %}
+        <div class="results">
+          <h3>Prediction Results</h3>
+          <p><strong>Likely Visit Mode:</strong> {{ prediction.visit_mode }}</p>
+          <p>
+            <strong>Expected Rating:</strong> {{ prediction.predicted_rating }}
+            / 5
+          </p>
+        </div>
+        {% endif %} {% if recommendations and recommendations|length > 0 %}
+        <div class="results">
+          <h3>Recommended Attractions</h3>
+          <ul class="recommendation-list">
+            {% for rec in recommendations %}
+            <li>
+              <span class="rec-name">{{ rec.Attraction }}</span>
+              {% if rec.AttractionType %}
+              <span class="rec-tag">{{ rec.AttractionType }}</span>
+              {% endif %} {% if rec.Rating %}
+              <span class="rec-rating"
+                >Avg Rating: {{ "%.2f"|format(rec.Rating) }}</span
+              >
+              {% endif %}
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+      </section>
 
-                {% if 'AttractionType' in feature_columns %}
-                <div class="form-group">
-                    <label for="AttractionType">Attraction Type</label>
-                    <select name="AttractionType" id="AttractionType">
-                        <option value="">Select attraction type</option>
-                        {% for t in attraction_types %}
-                        <option value="{{ t }}">{{ t }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                {% endif %}
-
-                <div class="form-actions">
-                    <button type="submit" class="btn-primary">Predict & Recommend</button>
-                </div>
-            </form>
-
-            {% if prediction %}
-            <div class="results">
-                <h3>Prediction Results</h3>
-                <p><strong>Likely Visit Mode:</strong> {{ prediction.visit_mode }}</p>
-                <p><strong>Expected Rating:</strong> {{ prediction.predicted_rating }} / 5</p>
-            </div>
-            {% endif %}
-
-            {% if recommendations and recommendations|length > 0 %}
-            <div class="results">
-                <h3>Recommended Attractions</h3>
-                <ul class="recommendation-list">
-                    {% for rec in recommendations %}
-                    <li>
-                        <span class="rec-name">{{ rec.Attraction }}</span>
-                        {% if rec.AttractionType %}
-                        <span class="rec-tag">{{ rec.AttractionType }}</span>
-                        {% endif %}
-                        {% if rec.Rating %}
-                        <span class="rec-rating">Avg Rating: {{ "%.2f"|format(rec.Rating) }}</span>
-                        {% endif %}
-                    </li>
-                    {% endfor %}
-                </ul>
-            </div>
-            {% endif %}
-        </section>
-
-        <section class="card">
-            <h2>Tourism Insights</h2>
-            <div class="charts-grid">
-                {% if eda.continent_labels %}
-                <div class="chart-card">
-                    <h3>Users by Continent</h3>
-                    <canvas id="continentChart"></canvas>
-                </div>
-                {% endif %}
-
-                {% if eda.type_labels %}
-                <div class="chart-card">
-                    <h3>Attractions by Type</h3>
-                    <canvas id="typeChart"></canvas>
-                </div>
-                {% endif %}
-
-                {% if eda.top_attraction_labels %}
-                <div class="chart-card full-width">
-                    <h3>Top Rated Attractions</h3>
-                    <canvas id="topAttractionChart"></canvas>
-                </div>
-                {% endif %}
-            </div>
-        </section>
+      <section class="card">
+        <h2>Tourism Insights</h2>
+        <div class="charts-grid">
+          {% if eda.continent_labels %}
+          <div class="chart-card">
+            <h3>Users by Continent</h3>
+            <canvas id="continentChart"></canvas>
+          </div>
+          {% endif %} {% if eda.type_labels %}
+          <div class="chart-card">
+            <h3>Attractions by Type</h3>
+            <canvas id="typeChart"></canvas>
+          </div>
+          {% endif %} {% if eda.top_attraction_labels %}
+          <div class="chart-card full-width">
+            <h3>Top Rated Attractions</h3>
+            <canvas id="topAttractionChart"></canvas>
+          </div>
+          {% endif %}
+        </div>
+      </section>
     </main>
 
     <footer class="footer">
-        <p>Tourism Experience Analytics &mdash; Regression · Classification · Recommendation</p>
+      <p>
+        Tourism Experience Analytics &mdash; Regression · Classification ·
+        Recommendation
+      </p>
     </footer>
 
     <script>
-        window.edaData = {{ eda | tojson }};
+      window.edaData = {{ eda | tojson }};
     </script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-</body>
+  </body>
 </html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Search History · Tourism Experience Analytics</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+    <header class="hero">
+        <div class="hero-content">
+            <h1>Your Search History</h1>
+            <p>Review your previous tourism predictions and recommendations.</p>
+        </div>
+        <nav class="hero-nav">
+            <span class="hero-user">Logged in as {{ user.email }}</span>
+            <a href="{{ url_for('index') }}" class="hero-link">Back to app</a>
+            <a href="{{ url_for('logout') }}" class="hero-link">Logout</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section class="card">
+            {% if history and history|length > 0 %}
+            <div class="history-table-wrapper">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Year</th>
+                            <th>Month</th>
+                            <th>Continent</th>
+                            <th>Attraction Type</th>
+                            <th>Predicted Mode</th>
+                            <th>Predicted Rating</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in history %}
+                        <tr>
+                            <td>{{ row["created_at"] }}</td>
+                            <td>{{ row["visit_year"] or "-" }}</td>
+                            <td>{{ row["visit_month"] or "-" }}</td>
+                            <td>{{ row["continent"] or "-" }}</td>
+                            <td>{{ row["attraction_type"] or "-" }}</td>
+                            <td>{{ row["predicted_mode"] or "-" }}</td>
+                            <td>{{ "%.2f"|format(row["predicted_rating"]) if row["predicted_rating"] is not none else "-" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p>You don’t have any saved searches yet. Run some predictions in the main app and they will appear here.</p>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>
+
