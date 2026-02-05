@@ -95,6 +95,23 @@ Open `http://localhost:5000` in your browser.
 
 ### 5. Deploying on Render
 
+#### Option A: Using render.yaml (Recommended)
+
+1. Push this project to a GitHub repository.
+2. In Render Dashboard:
+   - Click **"New +"** → **"Blueprint"**
+   - Connect your GitHub repository
+   - Render will automatically detect `render.yaml` and configure everything
+   - Click **"Apply"** to deploy
+
+The `render.yaml` file handles:
+- Installing dependencies
+- Training models (`python train_models.py`)
+- Starting the app with gunicorn
+- Setting environment variables
+
+#### Option B: Manual Setup
+
 1. Push this project to a Git repository (e.g. GitHub).
 2. In Render:
    - Create a **New Web Service**.
@@ -102,14 +119,15 @@ Open `http://localhost:5000` in your browser.
    - Set **Runtime** to Python 3.x.
    - **Build command**:
      ```bash
-     pip install -r requirements.txt
-     python train_models.py
+     pip install -r requirements.txt && python train_models.py
      ```
    - **Start command**:
      ```bash
      gunicorn app:app
      ```
 3. Make sure `data/raw/*.xlsx` are included in the repo so `train_models.py` can run in the Render environment.
+
+**Note**: See `DEPLOYMENT.md` for detailed deployment instructions and troubleshooting.
 
 Render will then host the Flask app, exposing the same UI and functionality as your local environment.
 

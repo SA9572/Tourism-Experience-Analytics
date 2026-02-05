@@ -54,10 +54,16 @@ def init_db() -> None:
     conn.close()
 
 # Load data and models once at startup
-master_df = pd.read_parquet(PROCESSED_DATA_DIR / "master.parquet")
-rating_model = joblib.load(MODELS_DIR / "rating_regressor.joblib")
-visitmode_model = joblib.load(MODELS_DIR / "visitmode_classifier.joblib")
-recommender: Dict[str, Any] = joblib.load(MODELS_DIR / "recommender.joblib")
+try:
+    master_df = pd.read_parquet(PROCESSED_DATA_DIR / "master.parquet")
+    rating_model = joblib.load(MODELS_DIR / "rating_regressor.joblib")
+    visitmode_model = joblib.load(MODELS_DIR / "visitmode_classifier.joblib")
+    recommender: Dict[str, Any] = joblib.load(MODELS_DIR / "recommender.joblib")
+    print("✓ Models and data loaded successfully")
+except Exception as e:
+    print(f"⚠ Error loading models/data: {e}")
+    print("⚠ Please ensure train_models.py has been run first")
+    raise
 
 
 def select_feature_columns(df: pd.DataFrame) -> List[str]:
@@ -185,7 +191,13 @@ eda_summaries = build_eda_summaries()
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "dev-secret-change-in-production")
-init_db()
+
+# Initialize database
+try:
+    init_db()
+    print("✓ Database initialized")
+except Exception as e:
+    print(f"⚠ Database initialization warning: {e}")
 
 
 def current_user() -> Optional[sqlite3.Row]:
@@ -361,4 +373,5 @@ def history():
 
 if __name__ == "__main__":
     # Local development
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)
