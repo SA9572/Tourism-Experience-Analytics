@@ -8,6 +8,6 @@ pyarrow
 openpyxl
 imbalanced-learn
 scipy
+altair==5.4.1
 streamlit
-altair>=5,<6
 
