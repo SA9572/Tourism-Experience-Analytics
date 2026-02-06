@@ -41,8 +41,9 @@ Open the URL shown in the terminal (usually `http://localhost:8501`).
    - **Main file path**: `streamlit_app.py`
    - **App URL**: e.g. `tourism-experience-analytics`
 
-4. **Advanced settings**
-   - **Python version**: 3.11 (or 3.10).
+4. **Advanced settings (important)**
+   - **Python version**: Set to **3.11**. (The stack uses Altair 5.x, which is incompatible with Python 3.13; if you already deployed with 3.13, delete the app and create a new one with Python 3.11.)
+   - The repo includes a `runtime.txt` with `python-3.11.9`; if the cloud ignores it, you must choose Python 3.11 in the Advanced settings when creating the app.
    - Streamlit Cloud will run:
      - `pip install -r requirements.txt`
    - You **must have models and processed data** in the repo, or the app will fail on import. So either:
