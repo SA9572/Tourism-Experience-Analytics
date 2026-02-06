@@ -9,4 +9,5 @@ openpyxl
 imbalanced-learn
 scipy
 streamlit
+altair>=5,<6
 
