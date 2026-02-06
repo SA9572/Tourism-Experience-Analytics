@@ -6,7 +6,7 @@ This project uses real tourism data (transactions, users, attractions, geography
 - **Recommend attractions** based on past behaviour (collaborative filtering)
 - **Visualise tourism insights** in a modern web UI
 
-The stack is **Python + scikit-learn for ML** and **Flask + HTML/CSS/JS** for the web app, deployable on **Render**.
+The stack is **Python + scikit-learn for ML** and **Flask + HTML/CSS/JS** (or **Streamlit**) for the web app, deployable on **Render**, **Vercel**, or **Streamlit Community Cloud**.
 
 ### 1. Project Structure
 
@@ -93,6 +93,16 @@ python app.py            # start Flask dev server
 
 Open `http://localhost:5000` in your browser.
 
+**Streamlit (single app = frontend + backend):**
+
+```bash
+pip install -r requirements.txt
+python train_models.py
+streamlit run streamlit_app.py
+```
+
+Open the URL shown (e.g. `http://localhost:8501`). See [DEPLOYMENT_STREAMLIT.md](DEPLOYMENT_STREAMLIT.md) for deploying the Streamlit app to Streamlit Community Cloud or Render.
+
 ### 5. Deploying on Render
 
 #### Option A: Using render.yaml (Recommended)
@@ -127,11 +137,18 @@ The `render.yaml` file handles:
      ```
 3. Make sure `data/raw/*.xlsx` are included in the repo so `train_models.py` can run in the Render environment.
 
-**Note**: See `DEPLOYMENT.md` for detailed deployment instructions and troubleshooting.
+**Note**: See `DEPLOYMENT.md` for detailed Render instructions and troubleshooting.
 
 Render will then host the Flask app, exposing the same UI and functionality as your local environment.
 
-### 6. How This Meets the Project Objectives
+### 6. Deploying on Vercel
+
+1. Push the project to GitHub (include `data/raw/*.xlsx`, `vercel.json`).
+2. Go to [vercel.com/new](https://vercel.com/new) and import the repository.
+3. The `vercel.json` build command will install dependencies and run `train_models.py`; deploy as usual.
+4. See **`DEPLOYMENT_VERCEL.md`** for full steps, limits (bundle size, serverless), and SQLite behavior on Vercel.
+
+### 7. How This Meets the Project Objectives
 
 - **Regression**: predict attraction ratings for a given user profile.
 - **Classification**: predict visit mode (Business / Family / Couples / Friends / etc.).

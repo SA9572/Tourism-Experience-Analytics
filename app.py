@@ -12,7 +12,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 BASE_DIR = Path(__file__).parent
 PROCESSED_DATA_DIR = BASE_DIR / "data" / "processed"
 MODELS_DIR = BASE_DIR / "models"
-DB_PATH = BASE_DIR / "app.db"
+# On Vercel, use /tmp for SQLite (writable); otherwise use project root
+DB_PATH = Path("/tmp/app.db") if os.environ.get("VERCEL") else BASE_DIR / "app.db"
 
 
 def get_db() -> sqlite3.Connection:

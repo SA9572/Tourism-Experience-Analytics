@@ -8,4 +8,5 @@ pyarrow
 openpyxl
 imbalanced-learn
 scipy
+streamlit
 

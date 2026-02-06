@@ -1,0 +1,5 @@
+{
+  "buildCommand": "pip install -r requirements.txt && python train_models.py",
+  "framework": "flask",
+  "installCommand": "pip install -r requirements.txt"
+}
